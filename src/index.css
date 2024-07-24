@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.divide-gray-600 > :nth-child(2) {
+    border: none !important;
+}
+
+
+  div {
+    scrollbar-width: thin;
+    scrollbar-color: #4b5563 transparent !important;
+  }
+
+  div::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  div::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0) !important;
+  }
+
+  div::-webkit-scrollbar-thumb {
+    background-color: #4b5563;
+    border-radius: 9999px !important;
+    border: 3px none #ffffff;
+  }
