@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { NavBar } from "./components/navbar";
-import { BoxClosed } from "./components/box-closed";
-import { BoxOpened } from "./components/box-opened";
+import { Box } from "./components/box";
 
 const tempMovieData = [
   {
@@ -49,26 +48,26 @@ const tempMovieData = [
 ];
 
 const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
+  // {
+  //   imdbID: "tt1375666",
+  //   Title: "Inception",
+  //   Year: "2010",
+  //   Poster:
+  //     "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+  //   runtime: 148,
+  //   imdbRating: 8.8,
+  //   userRating: 10,
+  // },
+  // {
+  //   imdbID: "tt0088763",
+  //   Title: "Back to the Future",
+  //   Year: "1985",
+  //   Poster:
+  //     "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+  //   runtime: 116,
+  //   imdbRating: 8.5,
+  //   userRating: 9,
+  // },
 ];
 
 const average = (arr: number[]) =>
@@ -94,51 +93,26 @@ export function App() {
       />
 
       <div className="flex flex-wrap gap-3">
-        {!movieBoxOpen && (
-          <BoxClosed 
-            type={"movie"}  
-            openHandler={setMovieBoxOpen}
-            query={query}
-          />
-        )}
+        <Box 
+          open={movieBoxOpen}
+          type={"movie"}  
+          openOrCloseHandler={setMovieBoxOpen}
+          query={query}
+          movies={movies}
+        />
 
-        {movieBoxOpen && (
-          <BoxOpened 
-            type="movie"
-            closeHandler={setMovieBoxOpen}
-            movies={movies}
-            query={query}
-          />
-        )}
-
-
-        {!watchedBoxOpen && (
-          <BoxClosed 
-            type={"watched"}  
-            openHandler={setWatchedBoxOpen}
-            watchedData={{
-              length: watched.length,
-              avgImdbRating: avgImdbRating,
-              avgRuntime: avgRuntime,
-              avgUserRating: avgUserRating
-            }}
-          />
-        )}
-
-        {watchedBoxOpen && (
-          <BoxOpened 
-            type="watched"
-            closeHandler={setWatchedBoxOpen}
-            watched={tempWatchedData}
-            watchedData={{
-              length: watched.length,
-              avgImdbRating: avgImdbRating,
-              avgRuntime: avgRuntime,
-              avgUserRating: avgUserRating
-            }}
-          />
-        )}
-
+        <Box 
+          open={watchedBoxOpen}
+          type={"watched"}  
+          openOrCloseHandler={setWatchedBoxOpen}
+          watched={tempWatchedData}
+          watchedData={{
+            length: watched.length,
+            avgImdbRating: avgImdbRating,
+            avgRuntime: avgRuntime,
+            avgUserRating: avgUserRating
+          }}
+        />
       </div>
     </>
   )
