@@ -1,3 +1,5 @@
+import { MovieAttr } from "../../utils/movie-attr"
+
 interface BoxTitleProps {
     title: string
     otherData: (string | number)[]
@@ -9,7 +11,7 @@ export function BoxTitle({ title, otherData }: BoxTitleProps) {
             <h2 className="font-semibold text-xl">{title}</h2>
             <div className="flex justify-between items-center">
                 {otherData.map((data, index) => (
-                    <p key={index}>{data}</p>
+                    <MovieAttr key={index}>{data}</MovieAttr>
                 ))}
             </div>
         </div>

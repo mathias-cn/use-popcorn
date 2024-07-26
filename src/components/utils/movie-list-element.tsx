@@ -1,10 +1,12 @@
-interface MovieElementProps {
+import { MovieAttr } from "./movie-attr"
+
+interface MovieListElementProps {
     title: string
     poster: string
     otherData: (string | number)[]
 }
 
-export function MovieElement({ title, poster, otherData }: MovieElementProps) {
+export function MovieListElement({ title, poster, otherData }: MovieListElementProps) {
     return (
         <div className="flex gap-3 p-4">
             <img className="max-w-16 rounded-md" src={poster} alt={`${title} Poster`} />
@@ -12,7 +14,7 @@ export function MovieElement({ title, poster, otherData }: MovieElementProps) {
                 <h3 className="font-semibold text-xl">{title}</h3>
                 <div className="flex gap-4 items-center">
                     {otherData.map((data, index) => (
-                        <p key={index}>{data}</p>
+                        <MovieAttr key={index}>{data}</MovieAttr>
                     ))}
                 </div>
             </div>
