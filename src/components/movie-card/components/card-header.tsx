@@ -1,16 +1,20 @@
 import { Button } from "../../utils/button";
 import { MovieAttr } from "../../utils/movie-attr";
 
+interface SelectedMovie {
+    imdbID: string;
+    Title: string;
+    Year: string;
+    Poster: string;
+    Genre: string;
+    Runtime: string;
+    imdbRating: number;
+    userRating: number;
+    Plot: string
+  }
+
 interface CardHeaderProps {
-    movie: {
-        imdbID: string;
-        Title: string;
-        Year: string;
-        Poster: string;
-        runtime: number;
-        imdbRating: number;
-        userRating: number;
-    }
+    movie: SelectedMovie
     handleCloseCard: (movie: null) => void
 }
 
@@ -23,9 +27,9 @@ export function CardHeader({ movie, handleCloseCard }: CardHeaderProps) {
 
             <img src={movie.Poster} alt={movie.Title} className="max-w-[100px] md:max-w-[160px]" />
             <div className="flex-1 p-4 md:p-8 bg-gray-600 flex flex-col justify-around">
-                <h2 className="font-bold text-2xl md:text-3xl">{movie.Title}</h2>
-                <MovieAttr>{movie.Year} - {movie.runtime} min</MovieAttr>
-                <MovieAttr>Categories...</MovieAttr>
+                <h2 className="font-bold text-xl md:text-2xl">{movie.Title}</h2>
+                <MovieAttr>{movie.Year} - {movie.Runtime}</MovieAttr>
+                <MovieAttr>{movie.Genre}</MovieAttr>
                 <MovieAttr>🌟 {movie.imdbRating} IMDb rating</MovieAttr>
             </div>
         </div>

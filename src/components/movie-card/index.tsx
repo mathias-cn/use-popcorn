@@ -2,20 +2,25 @@ import { CardDescription } from "./components/card-description";
 import { CardHeader } from "./components/card-header";
 import { CardRating } from "./components/card-rating";
 
+interface SelectedMovie {
+    imdbID: string;
+    Title: string;
+    Year: string;
+    Poster: string;
+    Genre: string;
+    Runtime: string;
+    imdbRating: number;
+    userRating: number;
+    Plot: string
+  }
+
 interface MovieCardProps {
-    movie: {
-        imdbID: string;
-        Title: string;
-        Year: string;
-        Poster: string;
-        runtime: number;
-        imdbRating: number;
-        userRating: number;
-    }
+    movie: SelectedMovie
     handleCloseCard: (movie: null) => void
+    addToListHandler: (movie: SelectedMovie) => void
 }
 
-export function MovieCard({ movie, handleCloseCard }: MovieCardProps) {
+export function MovieCard({ movie, handleCloseCard, addToListHandler }: MovieCardProps) {
     return (
         <>
             <CardHeader 
@@ -24,7 +29,14 @@ export function MovieCard({ movie, handleCloseCard }: MovieCardProps) {
             />
 
             <CardDescription>
-                <CardRating />
+                <CardRating 
+                    movie={movie}
+                    addToListHandler={addToListHandler}
+                />
+
+                <p className="w-full">
+                    {movie.Plot}
+                </p>
             </CardDescription>
         </>
     )

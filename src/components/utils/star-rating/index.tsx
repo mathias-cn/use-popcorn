@@ -4,9 +4,10 @@ import { Star } from "./components/full-star"
 interface StarRatingProps {
     maxRating?: number
     defaultRating?: number
+    setExternalRating?: (n: number) => void
 }
 
-export function StarRating({ maxRating = 5, defaultRating = 3 }: StarRatingProps) {
+export function StarRating({ maxRating = 5, defaultRating = 3, setExternalRating }: StarRatingProps) {
     const [rating, setRating] = useState(defaultRating)
     const [hoveredRating, setHoveredRating] = useState(0)
 
@@ -16,7 +17,10 @@ export function StarRating({ maxRating = 5, defaultRating = 3 }: StarRatingProps
                 {Array.from({ length: maxRating }, (_, i) => (
                     <Star 
                         selected={hoveredRating > rating ? hoveredRating >= i + 1 : rating >= i + 1}
-                        onClick={() => setRating(i+1)} 
+                        onClick={() => {
+                            setRating(i+1)
+                            if(setExternalRating) setExternalRating(i+1)
+                        }} 
                         onMouseEnter={() => setHoveredRating(i+1)}
                         onMouseLeave={() => setHoveredRating(0)}
                         key={i} 

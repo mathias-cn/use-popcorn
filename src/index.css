@@ -25,3 +25,10 @@
     border-radius: 9999px !important;
     border: 3px none #ffffff;
   }
+
+  .box-open {
+    max-height: 85vh;
+  }
+  .box-closed {
+    max-height: 96px;
+  }

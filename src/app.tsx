@@ -1,86 +1,31 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { NavBar } from "./components/navbar";
 import { Box } from "./components/box";
 import { Main } from "./components/main";
 import { MovieListElement } from "./components/utils/movie-list-element";
 import { MovieCard } from "./components/movie-card";
+import { api, API_KEY } from "./lib/axios";
+import { Loader } from "./components/utils/loader";
+import { ErrorMessage } from "./components/utils/error-message";
 
-const tempMovieData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt1375661236",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt0133093",
-    Title: "The Matrix",
-    Year: "1999",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt6751668",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "group-aria-selected:",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "234",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-];
+interface MoviesArray {
+  Title: string
+  Year: string
+  Type: string
+  Poster: string
+  imdbID: string
+}
 
-const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
-
-interface selectedMovie {
+interface SelectedMovie {
   imdbID: string;
   Title: string;
   Year: string;
   Poster: string;
-  runtime: number;
+  Genre: string;
+  Runtime: string;
   imdbRating: number;
   userRating: number;
+  Plot: string
 }
 
 const average = (arr: number[]) =>
@@ -88,25 +33,114 @@ const average = (arr: number[]) =>
 
 export function App() {
   const [query, setQuery] = useState("")
-  const [movies, setMovies] = useState(tempMovieData)
-  const [watched, setWatched] = useState(tempWatchedData)
-  const [selectedMovie, setSelectedMovie] = useState<null | selectedMovie>(watched[0])
+  const [movies, setMovies] = useState<MoviesArray[]>([])
+  const [watched, setWatched] = useState<SelectedMovie[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [isLoading2, setIsLoading2] = useState(false)
+  const [error2, setError2] = useState("")
+  const [selectedMovie, setSelectedMovie] = useState<null | SelectedMovie>(null)
+  const [selectedMovieId, setSelectedMovieId] = useState<null | string>(null)
 
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+  const avgRuntime = average(watched.map((movie) => Number(movie.Runtime.replace(" min", ""))));
 
   const watchedTitleDataArray = watched.length > 0 ? [
     `🎞️ ${watched.length} movies`,
     `⭐ ${avgImdbRating}`,
     `🌟 ${avgUserRating}`,
     `⏰ ${avgRuntime} min`,
-] : ["You haven't watched any movies"]
+  ] : ["You haven't watched any movies"]
+
+  const selectedMovieDataArray = selectedMovie ? [
+    `⭐ ${selectedMovie.userRating || 0}`,
+    `🌟 ${selectedMovie.imdbRating}`,
+    `⏰ ${selectedMovie.Runtime}`,
+  ] : ["No info to display"]
+
+  useEffect(() => {
+    async function fetchMovies() {
+      try {
+        setError("")
+        setIsLoading(true)  
+        const res = await api.get(`?apikey=${API_KEY}&s=${query}`)
+        
+        if(res.status < 200 || res.status >= 300) throw new Error("Something went wrong while searching the movie.")
+  
+        const data = res.data
+
+        if(data.Response === "False")  throw new Error("Movie not found!")
+
+        setMovies(data.Search)
+        setIsLoading(false)
+      } catch (err) {
+        err instanceof Error 
+        ? setError(err.message)
+        : setError("An unknown error ocurred")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if(query.length < 3) {
+      setMovies([])
+      return 
+    }
+
+    fetchMovies()
+  }, [query])
+
+  useEffect(() => {
+    async function fetchMovie() {
+      const selectedMovieInArray = watched.filter(m => m.imdbID === selectedMovieId)[0]
+      if(selectedMovieInArray) {
+        setSelectedMovie(selectedMovieInArray)
+        return
+      }
+
+      try {
+        setError2("")
+        setIsLoading2(true)  
+        const res = await api.get(`?apikey=${API_KEY}&i=${selectedMovieId}`)
+        
+        if(res.status < 200 || res.status >= 300) throw new Error("Something went wrong while searching the movie.")
+  
+        const data = res.data
+
+        if(data.Response === "False")  throw new Error("Movie not found!")
+
+        setSelectedMovie(data)
+        setIsLoading2(false)
+      } catch (err) {
+        err instanceof Error 
+        ? setError2(err.message)
+        : setError2("An unknown error ocurred")
+      } finally {
+        setIsLoading2(false)
+      }
+    }
+
+    if(!selectedMovieId) return
+
+    fetchMovie()
+  }, [selectedMovieId, watched])
+
+  function handleDisselectMovie() {
+    setSelectedMovie(null)
+    setSelectedMovieId(null)
+  }
+
+  function handleAddToList(movie: SelectedMovie) {
+    setWatched(watched => [movie, ...watched])
+    setSelectedMovie(null)
+    setSelectedMovieId(null)
+  }
 
   return (
     <>
       <NavBar 
-        moviesLength={movies.length} 
+        moviesLength={movies?.length || 0} 
         query={query}
         setQuery={setQuery}
       />
@@ -118,7 +152,9 @@ export function App() {
             otherData: [`${!query ? "Type something in the search bar" : `Search: ${query}`}`]
           }}
         >
-          {movies && movies.map((m, i) => (
+          {isLoading && <Loader />}
+          
+          {!isLoading && !error && movies && movies.map((m, i) => (
             <MovieListElement 
               key={i}  
               title={m.Title}
@@ -126,17 +162,40 @@ export function App() {
               otherData={[
                 `📆 ${m.Year}`,
               ]}
+              clickHandler={() => setSelectedMovieId(m.imdbID)}
             />
           ))}
+          
+          {error && <ErrorMessage error={error} />}
         </Box>
-        
-        {!selectedMovie ? <Box 
-          boxTitleData={{
+
+        {selectedMovieId && !selectedMovie && <Box boxTitleData={{
+            title: "LOADING THE MOVIE",
+            otherData: []
+          }}>
+            {isLoading2 && <Loader />}
+
+            {error2 && <ErrorMessage error={error2} />}
+          </Box>
+        }
+
+        {selectedMovie && <Box boxTitleData={{
+            title: selectedMovie.Title,
+            otherData: selectedMovieDataArray
+          }} titleDisplayedOnCloseOnly={true}>
+            <MovieCard
+              movie={selectedMovie}
+              handleCloseCard={handleDisselectMovie}
+              addToListHandler={handleAddToList}
+            />
+          </Box>
+        }
+
+        {!selectedMovie && !selectedMovieId && <Box boxTitleData={{
             title: "MOVIES YOU WATCHED",
             otherData: watchedTitleDataArray
-          }}
-          >
-            {!selectedMovie ? watched.map((m, i) => (
+          }}>
+            {watched.map((m, i) => (
                 <MovieListElement 
                   key={i}
                   title={m.Title}
@@ -144,28 +203,12 @@ export function App() {
                   otherData={[
                     `⭐ ${m.userRating}`,
                     `🌟 ${m.imdbRating}`,
-                    `⏰ ${m.runtime}`
+                    `⏰ ${m.Runtime}`
                   ]}
+                  clickHandler={() => setSelectedMovieId(m.imdbID)}
                 />
-              )) : 
-              <h1>asd</h1>
+              ))
             }
-          </Box> : <Box
-            boxTitleData={{
-              title: `Movie: ${selectedMovie.Title}`,
-              otherData: [
-                `📆 ${selectedMovie.Year}`, 
-                `⭐ ${selectedMovie.userRating}`, 
-                `🌟 ${selectedMovie.imdbRating}`,
-                `⏰ ${selectedMovie.runtime} min`,
-              ]
-            }}
-            titleDisplayedOnCloseOnly={true}
-          >
-            <MovieCard 
-              movie={selectedMovie} 
-              handleCloseCard={setSelectedMovie}
-            />
           </Box>
         }
       </Main>
