@@ -6,7 +6,7 @@ interface MainProps {
 
 export function Main({ children }: MainProps) {
     return (
-        <div className="flex flex-wrap gap-3 max-w-screen-xl max-h-[calc(100%-80px)]">
+        <div className="flex flex-wrap items-start justify-center gap-3 w-full max-w-screen-xl self-center max-h-[calc(100%-80px)]">
             {children}
         </div>
     )
