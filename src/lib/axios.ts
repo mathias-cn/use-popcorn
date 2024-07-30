@@ -4,5 +4,5 @@ import axios from 'axios'
 export const API_KEY = "e17511f4"
 
 export const api = axios.create({
-    baseURL: 'http://www.omdbapi.com/'
+    baseURL: 'https://www.omdbapi.com/'
 })
