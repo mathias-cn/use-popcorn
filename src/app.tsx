@@ -64,11 +64,15 @@ export function App() {
   ] : ["No info to display"]
 
   useEffect(() => {
+    const controller = new AbortController()
+
     async function fetchMovies() {
       try {
         setError("")
         setIsLoading(true)  
-        const res = await api.get(`?apikey=${API_KEY}&s=${query}`)
+        const res = await api.get(`?apikey=${API_KEY}&s=${query}`, {
+          signal: controller.signal
+        })
         
         if(res.status < 200 || res.status >= 300) throw new Error("Something went wrong while searching the movie.")
   
@@ -77,11 +81,12 @@ export function App() {
         if(data.Response === "False")  throw new Error("Movie not found!")
 
         setMovies(data.Search)
-        setIsLoading(false)
+        setError("")
       } catch (err) {
-        err instanceof Error 
-        ? setError(err.message)
-        : setError("An unknown error ocurred")
+        err instanceof Error
+        && err.name !== "AbortError" 
+        && err.message !== "canceled"
+        && setError(err.message)
       } finally {
         setIsLoading(false)
       }
@@ -89,10 +94,15 @@ export function App() {
 
     if(query.length < 3) {
       setMovies([])
+      setError("")
       return 
     }
 
     fetchMovies()
+
+    return function() {
+      controller.abort()
+    }
   }, [query])
 
   useEffect(() => {
