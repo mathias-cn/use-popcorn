@@ -12,7 +12,7 @@ const buttonVariants = tv({
         },
 
         colorSchema: {
-            dark: 'bg-gray-800',
+            dark: 'bg-gray-800 border-[2px] border-violet-600',
             light: 'bg-white text-violet-600 shadow-black shadow-lg',
             colored: 'bg-violet-600',
         },

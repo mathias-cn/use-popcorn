@@ -35,10 +35,12 @@ export function App() {
   const [query, setQuery] = useState("")
   const [movies, setMovies] = useState<MoviesArray[]>([])
   const [watched, setWatched] = useState<SelectedMovie[]>([])
+  
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [isLoading2, setIsLoading2] = useState(false)
   const [error2, setError2] = useState("")
+
   const [selectedMovie, setSelectedMovie] = useState<null | SelectedMovie>(null)
   const [selectedMovieId, setSelectedMovieId] = useState<null | string>(null)
 
@@ -93,9 +95,9 @@ export function App() {
 
   useEffect(() => {
     async function fetchMovie() {
-      const selectedMovieInArray = watched.filter(m => m.imdbID === selectedMovieId)[0]
-      if(selectedMovieInArray) {
-        setSelectedMovie(selectedMovieInArray)
+      const selectedMovieInArray = watched.filter(m => m.imdbID === selectedMovieId)
+      if(selectedMovieInArray.length > 0) {
+        setSelectedMovie(selectedMovieInArray[0])
         return
       }
 
@@ -109,14 +111,14 @@ export function App() {
         const data = res.data
 
         if(data.Response === "False")  throw new Error("Movie not found!")
-
-        setSelectedMovie(data)
-        setIsLoading2(false)
-      } catch (err) {
-        err instanceof Error 
-        ? setError2(err.message)
-        : setError2("An unknown error ocurred")
-      } finally {
+          
+          setSelectedMovie(data)
+          setIsLoading2(false)
+        } catch (err) {
+          err instanceof Error 
+          ? setError2(err.message)
+          : setError2("An unknown error ocurred")
+        } finally {
         setIsLoading2(false)
       }
     }
@@ -135,6 +137,27 @@ export function App() {
     setWatched(watched => [movie, ...watched])
     setSelectedMovie(null)
     setSelectedMovieId(null)
+  }
+
+  function handleRemoveFromList(id: string) {
+    setWatched(watched => watched.filter(w => w.imdbID !== id))
+    setSelectedMovie(null)
+    setSelectedMovieId(null)
+  }
+
+  function handleUpdateList(id: string, newRating: number) {
+    setSelectedMovie(null)
+    setSelectedMovieId(null)
+
+    const movieToUpdate = watched.filter(w => w.imdbID === id)[0]
+
+    if(newRating === movieToUpdate.userRating) return 
+
+    setWatched(watched => watched.map(w =>
+      w.imdbID === id
+      ? {...w, userRating: newRating}
+      : w
+    ))
   }
 
   return (
@@ -183,11 +206,22 @@ export function App() {
             title: selectedMovie.Title,
             otherData: selectedMovieDataArray
           }} titleDisplayedOnCloseOnly={true}>
-            <MovieCard
-              movie={selectedMovie}
-              handleCloseCard={handleDisselectMovie}
-              addToListHandler={handleAddToList}
-            />
+            {watched.map(w => w.imdbID).includes(String(selectedMovieId)) ? (
+              <MovieCard
+                movie={selectedMovie}
+                handleCloseCard={handleDisselectMovie}
+                inWatched={false}
+                removeHandler={handleRemoveFromList}
+                updateHandler={handleUpdateList}
+                />
+              ) : (
+                <MovieCard
+                movie={selectedMovie}
+                handleCloseCard={handleDisselectMovie}
+                inWatched={true}
+                addToListHandler={handleAddToList}
+              />
+            )}
           </Box>
         }
 

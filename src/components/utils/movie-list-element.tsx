@@ -9,7 +9,7 @@ interface MovieListElementProps {
 
 export function MovieListElement({ title, poster, otherData, clickHandler }: MovieListElementProps) {
     return (
-        <button onClick={clickHandler} className="w-full flex gap-3 p-4 hover:bg-gray-600 transition-all cursor-pointer">
+        <button onClick={clickHandler} className="w-full flex gap-3 p-4 hover:bg-gray-600 transition-all cursor-pointer text-left">
             <img className="max-w-16 rounded-md" src={poster} alt={`${title} Poster`} />
             <div>
                 <h3 className="font-semibold text-xl">{title}</h3>

@@ -17,10 +17,13 @@ interface SelectedMovie {
 interface MovieCardProps {
     movie: SelectedMovie
     handleCloseCard: (movie: null) => void
-    addToListHandler: (movie: SelectedMovie) => void
+    addToListHandler?: (movie: SelectedMovie) => void
+    updateHandler?: (id: string, newRating: number) => void
+    removeHandler?: (id: string) => void
+    inWatched: boolean
 }
 
-export function MovieCard({ movie, handleCloseCard, addToListHandler }: MovieCardProps) {
+export function MovieCard({ movie, handleCloseCard, addToListHandler, inWatched, updateHandler, removeHandler }: MovieCardProps) {
     return (
         <>
             <CardHeader 
@@ -29,10 +32,25 @@ export function MovieCard({ movie, handleCloseCard, addToListHandler }: MovieCar
             />
 
             <CardDescription>
-                <CardRating 
-                    movie={movie}
-                    addToListHandler={addToListHandler}
-                />
+                {inWatched && addToListHandler && (
+                    <CardRating 
+                        inWatched={true}    
+                        addActions={{
+                                movie: movie,
+                                addToListHandler: addToListHandler
+                            }}
+                    />
+                )}
+                {!inWatched && updateHandler && removeHandler && (
+                    <CardRating 
+                        inWatched={false}    
+                        removeAndUpdateActions={{
+                                imdbID: movie.imdbID,
+                                updateHandler: updateHandler,
+                                removeHandler: removeHandler
+                            }}
+                    />
+                )}
 
                 <p className="w-full">
                     {movie.Plot}
