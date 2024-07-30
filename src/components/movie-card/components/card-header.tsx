@@ -11,6 +11,8 @@ interface SelectedMovie {
     imdbRating: number;
     userRating: number;
     Plot: string
+    Director: string
+    Actors: string
   }
 
 interface CardHeaderProps {

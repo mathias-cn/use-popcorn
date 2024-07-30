@@ -12,6 +12,8 @@ interface SelectedMovie {
     imdbRating: number;
     userRating: number;
     Plot: string
+    Director: string
+    Actors: string
   }
 
 interface MovieCardProps {
@@ -52,9 +54,9 @@ export function MovieCard({ movie, handleCloseCard, addToListHandler, inWatched,
                     />
                 )}
 
-                <p className="w-full">
-                    {movie.Plot}
-                </p>
+                <p className="w-full">{movie.Plot}</p>
+                <p className="w-full"><span className="font-semibold">Director:</span> {movie.Director}</p>
+                <p className="w-full"><span className="font-semibold">Actors:</span> {movie.Actors}</p>
             </CardDescription>
         </>
     )
